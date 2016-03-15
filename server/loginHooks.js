@@ -48,11 +48,6 @@ Meteor.publish('roles-restricted/login-hooks', function () {
   this.onStop(() => {
     delete publishers[connId]
   })
-
-  // Meteor.setTimeout(() => {
-  //   this.added('roles-restricted/login-hooks', 'fake', {test: 1})
-  //   publishers[connId].added('roles-restricted/login-hooks', 'fake2', {test: 2})
-  // }, 2000)
 })
 
 // first argument is an attempt info object:

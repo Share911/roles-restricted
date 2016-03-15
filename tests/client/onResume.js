@@ -1,54 +1,34 @@
-// So you can be access in client JS console
-window.Meteor = Meteor
-window.Roles = Roles
-
-let addBadResumeToken = function(expired) {
-  let expiration = Date.now()
-  if (expired)
-    expiration -= 60 * 1000 // minute ago
-  else
-    expiration += 10 * 60 * 1000 // ten minutes hence
-  
+addBadResumeToken = function() {
   localStorage.setItem('Meteor.loginToken', 'e10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO8Va')
-  localStorage.setItem('Meteor.loginTokenExpires', new Date(expiration))
   localStorage.setItem('Meteor.userId', 'myid')
 }
 
 localStorage.clear()
 
-// Tinytest.addAsync(
-//   'roles-restricted - onResume called on success',
-//   function(test, done) {
-//     login(function() {
-//       // Meteor.disconnect()
-//     })
-    
-//     // Roles.onResumeAttemptCompleted(function({loggedIn}) {
-//     //   test.isTrue(loggedIn)
-//     //   done()
-//     // })
-//   })
-
-
 Tinytest.addAsync(
   'roles-restricted - onResume called on failure',
   function(test, done) {
-    Roles.onResumeAttemptCompleted(function({loggedIn}) {
+    let hook = Roles.onResumeAttemptCompleted(function({loggedIn}) {
       test.isFalse(loggedIn)
+      Roles.removeResumeAttemptCompletedHook(hook)
       done()
     })
     addBadResumeToken(false)
   })
 
 Tinytest.addAsync(
-  'roles-restricted - onResume not called when resume token is expired',
+  'roles-restricted - onResume called on success',
   function(test, done) {
-    Roles.onResumeAttemptCompleted(function() {
-      test.isTrue(false)
+    login(function() {
+      Meteor.disconnect()
+
+      Roles.onResumeAttemptCompleted(function({loggedIn}) {
+        test.isTrue(loggedIn)
+        done()
+      })
+
+      Meteor.reconnect()
     })
-    addBadResumeToken(true)
-    setTimeout(function() {
-      done()
-    }, 1000)
   })
+
 

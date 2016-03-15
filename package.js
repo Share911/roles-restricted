@@ -35,5 +35,6 @@ Package.onTest(function(api) {
   api.addFiles(['tests/server/helpers.js'], 'server');
 
   api.addFiles(['tests/client/helpers.js',
+                'tests/client/loginHooks.js',
                 'tests/client/onResume.js'], 'client');
 });

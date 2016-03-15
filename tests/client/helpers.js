@@ -1,3 +1,7 @@
+// Place on `window` so you can access in browser console
+window.Meteor = Meteor
+window.Roles = Roles
+
 window.serverinfo = function() {
   Meteor.call('whoami', function(e, r) {
     l('userId: ', r);
@@ -9,7 +13,6 @@ window.serverinfo = function() {
     l('roles: ', r);
   })
 }
-
 
 login = function(cb){
   Meteor.logout()

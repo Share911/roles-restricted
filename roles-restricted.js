@@ -8,6 +8,11 @@ l = function(){
 let _BaseRoles = Roles
 
 Roles = {
+  isUnrestricted(conn) {
+    conn || (conn = this._getConnection())
+    return conn._roles && conn._roles.unrestricted
+  },
+
   _BaseRoles,
 
   _getConnection() {
@@ -18,6 +23,7 @@ Roles = {
   },
   
   _unrestrictConnection(conn) {
+    l('unrestricted')
     conn || (conn = this._getConnection())
 
     if (!conn._roles)
@@ -26,6 +32,7 @@ Roles = {
   },
 
   _clearUnrestriction(conn) {
+    l('clear unrestricted')
     conn || (conn = this._getConnection())
 
     if (conn._roles)
