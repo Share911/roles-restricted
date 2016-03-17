@@ -13,6 +13,13 @@ Roles = {
     return conn._roles && conn._roles.unrestricted
   },
 
+  restrict({type, roles}) {
+    //call method on client
+    // check not already logged in
+    conn = this._getConnection()
+    0
+  },
+                                          
   _BaseRoles,
 
   _getConnection() {

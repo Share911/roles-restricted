@@ -17,4 +17,19 @@ Tinytest.addAsync(
     })
   })
 
+Tinytest.addAsync(
+  'roles-restricted - unrestricted after resume',
+  function(test, done) {
+    login(function() {
+      Meteor.disconnect()
+
+      Roles.onResumeAttemptCompleted(function() {
+        test.isTrue(Roles.isUnrestricted())
+        done()
+      })
+
+      Meteor.reconnect()
+    })
+  })
+
 

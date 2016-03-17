@@ -8,7 +8,7 @@ localStorage.clear()
 Tinytest.addAsync(
   'roles-restricted - onResume called on failure',
   function(test, done) {
-    let hook = Roles.onResumeAttemptCompleted(function({loggedIn}) {
+    let hook = Roles.onResumeAttemptCompleted(function(loggedIn) {
       test.isFalse(loggedIn)
       Roles.removeResumeAttemptCompletedHook(hook)
       done()
@@ -22,7 +22,7 @@ Tinytest.addAsync(
     login(function() {
       Meteor.disconnect()
 
-      Roles.onResumeAttemptCompleted(function({loggedIn}) {
+      Roles.onResumeAttemptCompleted(function(loggedIn) {
         test.isTrue(loggedIn)
         done()
       })

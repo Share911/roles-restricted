@@ -63,7 +63,7 @@ LoginHooks.find({}).observeChanges({
       Meteor.connection._lastSessionId)
     if (data.connId === Meteor.connection._lastSessionId) {
       if (data.type === 'resume')
-        callResumeAttemptCompletedHooks(data)
+        callResumeAttemptCompletedHooks(data.loggedIn)
 
       if (data.loggedIn)
         maybeUnrestrictLogin(data)

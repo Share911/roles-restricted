@@ -14,6 +14,7 @@ Package.onUse(function(api) {
            'tracker',
            'reactive-var',
            'random',
+           'loren:login-links',
            'alanning:roles@1.2.15'])
 
   api.export('Roles');
