@@ -4,7 +4,7 @@ The main use case is sending an email or sms to your user with a link to your ap
 
 `Josh Owens just commented on your post: https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a`
 
-If you want the user to be fully logged in, use the package (loren:login-links)[https://github.com/lorensr/login-links.git]. If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL).
+If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL).
 
 - [Basic usage](#basic-usage)
   - [On server](#on-server)
@@ -71,7 +71,7 @@ if (! Meteor.userId()) {
 
 ### Restrictions
 
-You can configure restrictions using [types](#setRestrictionTypes) or on a [per-token basis](#generateRestrictedAccessToken).
+You can configure restrictions using [types](#setrestrictiontypes) or on a [per-token basis](#generaterestrictedaccesstoken).
 
 The roles a user has in a restricted state is the intersection of the restricted `roles` and their normal roles (`user.roles`). For example in the below scenario, the restricted role list would be `['user']`.
 
@@ -88,8 +88,8 @@ When a login is attempted with a token that is expired, a `'login-links/token-ex
 You can configure expiration in three ways:
 
 - globally: `Roles.setDefaultExpirationInSeconds(60 * 60); // one hour`
-- per [type](#setRestrictionTypes)
-- per [token](#generateRestrictedAccessToken)
+- per [type](#setrestrictiontypes)
+- per [token](#generaterestrictedaccesstoken)
 
 ## API
 
