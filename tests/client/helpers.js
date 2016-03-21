@@ -17,11 +17,13 @@ window.serverinfo = function() {
 login = function(cb){
   Meteor.logout()
   Meteor.call('cleardb', function(){
+    l('createUser')
     Accounts.createUser({
       email: 'a@b',
       password: 'a'
     }, function(){
-      cb()
+      // wait for unrestriction to occur
+      Meteor.defer(cb)
     })
   })
 }

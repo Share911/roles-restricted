@@ -2,17 +2,18 @@ Tinytest.addAsync(
   'roles-restricted - unrestricted works with password login',
   function(test, done) {
     login(function() {
-      l('d',Meteor.connection._roles)
       test.isTrue(Roles.isUnrestricted())
 
-      Meteor.logout()
+      Meteor.logout(function() {
+        test.isFalse(Roles.isUnrestricted())
 
-      test.isFalse(Roles.isUnrestricted())
-
-      Meteor.loginWithPassword('a@b','a', function(e, r) {
-        l('withpass')
-        test.isTrue(Roles.isUnrestricted())
-        done()
+        Meteor.loginWithPassword('a@b','a', function(e, r) {
+          // wait for unrestriction
+          Meteor.defer(function() {
+            test.isTrue(Roles.isUnrestricted())
+            done()
+          })
+        })
       })
     })
   })
@@ -23,8 +24,9 @@ Tinytest.addAsync(
     login(function() {
       Meteor.disconnect()
 
-      Roles.onResumeAttemptCompleted(function() {
+      let hook = Roles.onResumeAttemptCompleted(function() {
         test.isTrue(Roles.isUnrestricted())
+        Roles.removeResumeAttemptCompletedHook(hook)
         done()
       })
 

@@ -2,7 +2,9 @@ Meteor package that adds a restricted-access state and autologin links to [alann
 
 The main use case is sending an email or sms to your user with a link to your app that contains an OTP (one-time password) that automatically logs them in (so they don't have to enter their username/password or do oauth):
 
-`Josh Owens just commented on your post: https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a`
+```
+Josh Owens just commented on your post: https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a
+```
 
 If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL).
 
@@ -23,13 +25,14 @@ If you want the user to be fully logged in, use the package [loren:login-links](
     - [restrict](#restrict)
 - [Package dev](#package-dev)
   - [Testing](#testing)
-
+- [Credits](#credits)
+  
 ## Basic usage
 
 1. Configure your restriction types.
 1. Generate an access token.
 1. Put it in a secure HTTPS URL and send it to the user via email, sms, etc.
-1. When the user clicks the link, get the token from the URL and use it to log the user in.
+1. When the user clicks the link, get the token from the URL and use it to log in the user.
 
 ### On server
 
@@ -38,7 +41,7 @@ alice.roles // ['user', 'admin']
 
 Roles.setRestrictionTypes({
   userOnly: {roles: ['user']}
-})
+});
 
 token = Roles.generateRestrictedAccessToken(alice, {type: 'userOnly'});
 
@@ -59,10 +62,11 @@ if (! Meteor.userId()) {
   token = get token from URL (depends on your router and link format)
 
   Roles.restrictedLogin(token, function(e, r) {
-    if (!e)
-      alice = Meteor.user()
-      Roles.userIsInRole(alice, ['user']) // true
-      Roles.userIsInRole(alice, ['admin']) // false
+    if (!e) {
+      alice = Meteor.user();
+      Roles.userIsInRole(alice, ['user']); // true
+      Roles.userIsInRole(alice, ['admin']); // false
+    }
   });
 }   
 ```
@@ -73,12 +77,12 @@ if (! Meteor.userId()) {
 
 You can configure restrictions using [types](#setrestrictiontypes) or on a [per-token basis](#generaterestrictedaccesstoken).
 
-The roles a user has in a restricted state is the intersection of the restricted `roles` and their normal roles (`user.roles`). For example in the below scenario, the restricted role list would be `['user']`.
+The roles a user has in a restricted state is the intersection of the restricted `roles` list you configure and their normal roles (`user.roles`). For example in the below scenario, the restricted user would only have the `user` role.
 
 ```javascript
-alice = Meteor.user() // alice.roles is ['user', 'admin']
+// alice.roles is ['user', 'admin']
 
-Roles.generateRestrictedAccessToken(alice, {roles: ['user', 'editor']})
+Roles.generateRestrictedAccessToken(alice, {roles: ['user', 'editor']});
 ```
 
 ### Expiration
@@ -103,7 +107,9 @@ Roles.setRestrictionTypes({
     expirationInSeconds: 10 * 60 // optional
   },
   typeName2: ...
-})
+});
+
+Roles.generateRestrictedAccessToken(alice, {type: 'typeName1'});
 ```
 
 Using types is optional.
@@ -143,9 +149,8 @@ The `cb` function is provided a boolean argument `loggedIn` (whether the resume 
 In the basic example, we check `Meteor.userId()` at load time before doing a `restrictedLogin` - if the user is already logged in, we don't need to do a restricted login.
 
 ```javascript
-if (! Meteor.userId()) {
-  Roles.restrictedLogin(token, cb)
-}
+if (! Meteor.userId())
+  Roles.restrictedLogin(token, cb);
 ```
 
 `Meteor.userId()` is optimistically set at pageload when Meteor is in the process of doing a resume login. In some cases - if the resume token has expired or been removed from the database (for instance by [Meteor.logoutOtherClients](http://docs.meteor.com/#/full/meteor_logoutotherclients)), then the resume login will fail, and `Meteor.userId()` will be set to null. To handle these cases, you can do the following:
@@ -156,17 +161,17 @@ token = // get from URL
 if (Meteor.userId()) {
   Roles.onResumeAttemptCompleted(function(loggedIn) {
     if (! loggedIn) 
-      Roles.restrictedLogin(token, cb)
-  }
+      Roles.restrictedLogin(token, cb);
+  });
 } else {
-  Roles.restrictedLogin(token, cb)
+  Roles.restrictedLogin(token, cb);
 }  
 ```
 
 #### removeResumeAttemptCompletedHook 
 
 ```javascript
-var hook = Roles.onResumeAttemptCompleted
+var hook = Roles.onResumeAttemptCompleted(fn)
 Roles.removeResumeAttemptCompletedHook(hook)
 ```
 
@@ -199,3 +204,9 @@ cd roles-restricted
 meteor test-packages ./
 open localhost:3000
 ```
+
+## Credits
+
+Thanks to Share911 for sponsoring. [share911.com](https://share911.com/) - An emergency response system for your organization.
+
+[Contributors](https://github.com/lorensr/roles-restricted/graphs/contributors)

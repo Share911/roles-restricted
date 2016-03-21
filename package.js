@@ -19,8 +19,12 @@ Package.onUse(function(api) {
 
   api.export('Roles');
 
-  api.addFiles('roles-restricted.js');
-  api.addFiles(['server/loginHooks.js'], 'server');
+  api.addFiles(['roles-restricted.js',
+                'roles_overwrites.js']);
+
+  api.addFiles(['server/restrictedAccessToken.js',
+                'server/loginHooks.js'], 'server');
+
   api.addFiles(['client/loginHooks.js'], 'client');
 });
 
@@ -36,6 +40,7 @@ Package.onTest(function(api) {
   api.addFiles(['tests/server/helpers.js'], 'server');
 
   api.addFiles(['tests/client/helpers.js',
+                'tests/client/roles.js',
                 'tests/client/loginHooks.js',
                 'tests/client/onResume.js'], 'client');
 });

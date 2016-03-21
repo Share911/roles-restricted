@@ -9,11 +9,16 @@ let maybeUnrestrictLogin = function({loggedIn, userId}) {
 
     } else {
       // sometimes Meteor.userId() has not been set until after deferring
+      // XXX is it ever not set? change to reactive trigger on Meteor.userId()?
       Meteor.defer(function() {
         isCorrectUser = userId === Meteor.userId()
         if (isCorrectUser) {
           l('deferred unrestricting')
           Roles._unrestrictConnection()
+        } else {
+          console.warn("roles-restricted warning: onLogin server event userId ("
+                       + userId + ") doesn't match client Meteor.userId() (" +
+                       Meteor.userId() + "). Please submit an issue on Github.")
         }
       })
     }
@@ -22,7 +27,7 @@ let maybeUnrestrictLogin = function({loggedIn, userId}) {
 
 let lastUserId = null
 
-// On logout, remove unrestricted
+// on logout, remove unrestricted
 Tracker.autorun(function() {
   // react to changes in Meteor.userId()
   let userId = Meteor.userId()
@@ -30,6 +35,7 @@ Tracker.autorun(function() {
   let wasLoggedIn = !! lastUserId,
       nowLoggedOut = ! userId
 
+  l('remove unrestricted autorun', wasLoggedIn, nowLoggedOut)
   if (wasLoggedIn && nowLoggedOut)
     Roles._clearUnrestriction()
 
@@ -47,7 +53,6 @@ Roles.onResumeAttemptCompleted = function(hook) {
 Roles.removeResumeAttemptCompletedHook = function(hook) {
   hooks = _.without(hooks, hook)
 }
-
 
 let callResumeAttemptCompletedHooks = function(data) {
   for (hook of hooks) {
