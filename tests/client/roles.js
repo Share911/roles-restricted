@@ -23,7 +23,12 @@ let users = {
 }
 
 function testRestrictedUser (test, username, expectedRoles, group) {
-  Roles.restrict({roles: ['user']})
+  restriction = {roles: ['user']}
+  if (group)
+    restriction.group = group
+
+  Roles.restrict(restriction)
+  
   testUser(test, username, expectedRoles, group)
 }
 
@@ -44,23 +49,35 @@ Tinytest.add(
 Tinytest.add(
   'roles-restricted - can check if restricted user is in role with Roles.GLOBAL_GROUP',
   function (test) {
-    testRestrictedUser(test, 'joe', ['user'])
     testRestrictedUser(test, 'joe', ['user'], Roles.GLOBAL_GROUP)
     testRestrictedUser(test, 'joe', ['user'], 'group1')
   })
 
 Tinytest.add(
+  'roles-restricted - restricted user is in role with Roles.GLOBAL_GROUP when no group given',
+  function(test) {
+    Roles.restrict({roles: ['user'], group: Roles.GLOBAL_GROUP})
+    testUser(test, 'joe', ['user'])
+  })
+
+
+Tinytest.add(
   'roles-restricted - defaults secure when no information on the connection',
   function (test) {
-    // todo blank connection
-    testRestrictedUser(test, 'eve', [])
+    // clear connection from previous tests
+    let conn = Roles._getConnection()
+    delete conn._roles
+
+    testUser(test, 'eve', [])
   })
     
 Tinytest.add(
   'roles-restricted - defaults secure when not logged in',
   function (test) {
-    // todo connection without userId
-    testRestrictedUser(test, 'eve', [])
+    Meteor.logout(function() {
+      Roles._unrestrictConnection()
+      testRestrictedUser(test, 'eve', [])
+    })
   })
 
 
@@ -68,6 +85,7 @@ Tinytest.add(
 
 function testUnrestrictedUser () {
   Roles._unrestrictConnection()
+  Meteor.connection.setUserId('foo')
   testUser(...arguments)
 }
 

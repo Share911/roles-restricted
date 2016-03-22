@@ -8,7 +8,12 @@ l = function(){
 
 let _BaseRoles = Roles
 
-Roles = {
+Roles = _.clone(_BaseRoles)
+
+_.extend(Roles, {
+
+  _BaseRoles,
+
   isUnrestricted(conn) {
     conn || (conn = this._getConnection())
     return conn._userId && conn._roles && conn._roles.unrestricted
@@ -17,7 +22,7 @@ Roles = {
   restrict({type, roles, group}) {
     //call method on client
     // check not already logged in
-    conn = this._getConnection()
+    let conn = this._getConnection()
 
     if (!conn._roles)
       conn._roles = {}
@@ -25,35 +30,45 @@ Roles = {
     if (conn._roles.unrestricted)
       delete conn._roles.unrestricted
 
-    if (group) {
-      conn._roles.restrictedRoles = {}
-      conn._roles.restrictedRoles[group] = roles
-    } else {
-      conn._roles.restrictedRoles = roles
-    }
+    conn._roles.restrictedRoles = {}
+    if (group)
+      conn._roles.restrictedRoles.group = group
+
+    conn._roles.restrictedRoles.roles = roles
   },
   
-  restrictedRoles() {
-    conn = this._getConnection()
+  getRestriction() {
+    let conn = this._getConnection()
 
     if (conn && conn._roles && conn._roles.restrictedRoles) {
       return conn._roles.restrictedRoles
     } else {
-      return []
+      return {roles: []}
     }
   },
 
   determineRoles(user) {
-    if (Roles.isUnrestricted())
+    let restriction = Roles.getRestriction()
+
+    if (Roles.isUnrestricted()) {
       return user.roles
-    else if (Roles.restrictedRoles())
-      return _.intersection(user.roles, Roles.restrictedRoles())
-    else
+    } else if (restriction) {
+      if (restriction.group) {
+        let roles = {}
+        let userRoles = user.roles[restriction.group]
+        // l('userRoles', user, restriction, _.intersection(userRoles, restriction.roles))
+
+        roles[restriction.group] = _.intersection(userRoles, restriction.roles)
+        return roles
+
+      } else {
+        return _.intersection(user.roles, restriction.roles)
+      }
+    } else {
       return []
+    }
   },
 
-
-  _BaseRoles,
 
   _getConnection() {
     if (Meteor.isServer)
@@ -78,4 +93,5 @@ Roles = {
     if (conn._roles)
       delete conn._roles.unrestricted
   }
-}
+
+}) // end _.extend(Roles, ...)

@@ -5,6 +5,9 @@ let normalizedUser = function(user) {
       {fields: {roles: 1}})
   } 
 
+  // don't alter the object given
+  user = _.clone(user)
+  
   user.roles = Roles.determineRoles(user)
 
   return user
@@ -20,3 +23,5 @@ _.extend(Roles, {
   }
 
 })
+
+
