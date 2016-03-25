@@ -3,10 +3,10 @@ let normalizedUser = function(user) {
     user = Meteor.users.findOne(
       {_id: user},
       {fields: {roles: 1}})
-  } 
-
-  // don't alter the object given
-  user = _.clone(user)
+  } else {
+    // don't mutate the object given
+    user = _.clone(user)
+  }
   
   user.roles = Roles.determineRoles(user)
 

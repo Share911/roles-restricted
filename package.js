@@ -22,10 +22,13 @@ Package.onUse(function(api) {
   api.addFiles(['roles-restricted.js',
                 'roles_overwrites.js']);
 
-  api.addFiles(['server/restrictedAccessToken.js',
+  api.addFiles(['server/roles-restricted.js',
+                'server/connectionLogin.js',
+                'server/restrictedAccessToken.js',
                 'server/loginHooks.js'], 'server');
 
-  api.addFiles(['client/loginHooks.js'], 'client');
+  api.addFiles(['client/roles-restricted.js',
+                'client/loginHooks.js'], 'client');
 });
 
 Package.onTest(function(api) {
@@ -40,7 +43,7 @@ Package.onTest(function(api) {
   api.addFiles(['tests/server/helpers.js'], 'server');
 
   api.addFiles(['tests/client/helpers.js',
-                'tests/client/roles.js',
+                'tests/client/userIsInRole.js',
                 'tests/client/loginHooks.js',
                 'tests/client/onResume.js'], 'client');
 });

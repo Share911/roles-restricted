@@ -85,6 +85,8 @@ The roles a user has in a restricted state is the intersection of the restricted
 Roles.generateRestrictedAccessToken(alice, {roles: ['user', 'editor']});
 ```
 
+The restricted roles are used for `Roles.userIsInRole(user, role)` when `user` is the logged-in user, as well as `Roles.getRolesForUser` and the `isInRole` UI helper. They are __not__ used for `getUsersInRole` or `getGroupsForUser` - those and all other functions remain unchanged from the base Roles package.
+
 ### Expiration
 
 When a login is attempted with a token that is expired, a `'login-links/token-expired'` error will be thrown. The default token expiration is one day. 

@@ -20,8 +20,6 @@ _.extend(Roles, {
   },
 
   restrict({type, roles, group}) {
-    //call method on client
-    // check not already logged in
     let conn = this._getConnection()
 
     if (!conn._roles)
@@ -29,6 +27,10 @@ _.extend(Roles, {
 
     if (conn._roles.unrestricted)
       delete conn._roles.unrestricted
+
+    if (type) {
+      
+    }
 
     conn._roles.restrictedRoles = {}
     if (group)
@@ -50,7 +52,8 @@ _.extend(Roles, {
   determineRoles(user) {
     let restriction = Roles.getRestriction()
 
-    if (Roles.isUnrestricted()) {
+    // restrictions only apply to current user
+    if (Roles.isUnrestricted() || (user._id !== Meteor.userId())) {
       return user.roles
     } else if (restriction) {
       if (restriction.group) {
@@ -65,10 +68,27 @@ _.extend(Roles, {
         return _.intersection(user.roles, restriction.roles)
       }
     } else {
+      // if somehow Meteor.userId() is set but the connection is neither
+      // restricted nor unrestricted, default secure
       return []
     }
   },
 
+  _restrictionTypes: {},
+
+  setRestrictionTypes(types) {
+    for ([name, type] in types) {
+      check(type, {
+        roles: [String],
+        group: Match.Optional(String),
+        expirationInSeconds: Match.Optional(Match.Integer)
+      }, 'incorrect setRestrictionTypes format')
+    }
+    
+    this._restrictionTypes = types
+  },
+  
+  // -- private functions --
 
   _getConnection() {
     if (Meteor.isServer)

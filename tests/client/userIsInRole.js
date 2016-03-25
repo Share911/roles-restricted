@@ -3,7 +3,7 @@ let roles = ['admin', 'editor', 'user']
 let users = {
   'eve': {
     _id: 'eve',
-    roles: ['admin', 'user']
+    roles: ['user', 'admin']
   },
   'bob': {
     _id: 'bob',
@@ -22,7 +22,11 @@ let users = {
   }
 }
 
+// -- restricted --
+
 function testRestrictedUser (test, username, expectedRoles, group) {
+  Meteor.connection.setUserId(username)      
+
   restriction = {roles: ['user']}
   if (group)
     restriction.group = group
@@ -62,30 +66,36 @@ Tinytest.add(
 
 
 Tinytest.add(
-  'roles-restricted - defaults secure when no information on the connection',
+  'roles-restricted - defaults secure when neither restricted nor unrestricted',
   function (test) {
     // clear connection from previous tests
-    let conn = Roles._getConnection()
+    let conn = Meteor.connection
     delete conn._roles
+
+    conn.setUserId('eve')    
 
     testUser(test, 'eve', [])
   })
     
 Tinytest.add(
-  'roles-restricted - defaults secure when not logged in',
+  "roles-restricted - uses not-logged-in user's full roles",
   function (test) {
-    Meteor.logout(function() {
-      Roles._unrestrictConnection()
-      testRestrictedUser(test, 'eve', [])
-    })
+    Meteor.connection.setUserId('foo')    
+
+    restriction = {roles: ['user']}
+    Roles.restrict(restriction)
+  
+    testUser(test, 'eve', ['user', 'admin'])
   })
+
+
 
 
 // -- unrestricted --
 
-function testUnrestrictedUser () {
+function testUnrestrictedUser (test, username, expectedRoles, group) {
   Roles._unrestrictConnection()
-  Meteor.connection.setUserId('foo')
+  Meteor.connection.setUserId(username)
   testUser(...arguments)
 }
 
