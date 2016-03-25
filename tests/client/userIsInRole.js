@@ -40,6 +40,7 @@ Tinytest.add(
   'roles-restricted - can check if restricted user is in role',
   function (test) {
     testRestrictedUser(test, 'eve', ['user'])
+    test.equal(Roles.getRolesForUser(users['eve']), ['user'])
   })
 
 Tinytest.add(
@@ -86,6 +87,7 @@ Tinytest.add(
     Roles.restrict(restriction)
   
     testUser(test, 'eve', ['user', 'admin'])
+    test.equal(Roles.getRolesForUser(users['eve']), ['user', 'admin'])
   })
 
 

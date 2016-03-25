@@ -29,7 +29,10 @@ _.extend(Roles, {
       delete conn._roles.unrestricted
 
     if (type) {
-      
+      let typeConfig = Roles._restrictionTypes[type]
+      roles = typeConfig.roles
+      if (typeConfig.group)
+        group = typeConfig.group
     }
 
     conn._roles.restrictedRoles = {}
@@ -77,7 +80,9 @@ _.extend(Roles, {
   _restrictionTypes: {},
 
   setRestrictionTypes(types) {
-    for ([name, type] in types) {
+    for (let name in types) {
+      // l('setRestrictionTypes', name, type, types)
+      let type = types[name]
       check(type, {
         roles: [String],
         group: Match.Optional(String),
@@ -86,6 +91,14 @@ _.extend(Roles, {
     }
     
     this._restrictionTypes = types
+
+    if (Meteor.isServer) {
+      // don't call setTypes in case LoginLinks package is also used
+      // (we'd be overwriting)
+      // 
+      // extra data in type objects doesn't matter
+      _.extend(LoginLinks._accessTokenTypes, types) 
+    }
   },
   
   // -- private functions --

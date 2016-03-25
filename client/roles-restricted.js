@@ -7,6 +7,8 @@ _.extend(Roles, {
 
       cb(error, data)
     })
-  }
+  },
+
+  setDefaultExpirationInSeconds() {} // server-only
 
 })

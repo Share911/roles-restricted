@@ -22,5 +22,11 @@ Meteor.methods({
     roles = DDP._CurrentInvocation.get().connection._roles
     l('roles: ', roles)
     return roles
+  },
+
+  setRolesAndGenerateToken(userId, roles, opts) {
+    Meteor.users.update(userId, {$set: {roles}})
+    return Roles.generateRestrictedAccessToken(userId, opts)
   }
+
 })

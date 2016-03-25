@@ -20,6 +20,11 @@ _.extend(Roles, {
     // l(Roles._BaseRoles.userIsInRole(...arguments))
     user = normalizedUser(user)
     return Roles._BaseRoles.userIsInRole(user, roles, group)
+  },
+
+  getRolesForUser(user, group) {
+    user = normalizedUser(user)
+    return Roles._BaseRoles.getRolesForUser(user, group)
   }
 
 })

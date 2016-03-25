@@ -12,6 +12,7 @@ Package.onUse(function(api) {
            'underscore',
            'accounts-base',
            'tracker',
+           'check',
            'reactive-var',
            'random',
            'loren:login-links',
@@ -43,6 +44,7 @@ Package.onTest(function(api) {
   api.addFiles(['tests/server/helpers.js'], 'server');
 
   api.addFiles(['tests/client/helpers.js',
+                'tests/client/restrictedLogin.js',
                 'tests/client/userIsInRole.js',
                 'tests/client/loginHooks.js',
                 'tests/client/onResume.js'], 'client');
