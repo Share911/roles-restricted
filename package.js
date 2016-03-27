@@ -15,6 +15,7 @@ Package.onUse(function(api) {
            'check',
            'reactive-var',
            'random',
+           'ddp',
            'loren:login-links',
            'alanning:roles@1.2.15'])
 
