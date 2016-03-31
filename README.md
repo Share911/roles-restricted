@@ -18,6 +18,7 @@ If you want the user to be fully logged in, use the package [loren:login-links](
   - [setRestrictionTypes](#setrestrictiontypes)
   - [generateRestrictedAccessToken](#generaterestrictedaccesstoken)
   - [restrictedLogin](#restrictedLogin)
+  - [isInRoleWhenUnrestricted](#isinrolewhenunrestricted)
   - [Advanced](#advanced)
     - [onResumeAttemptCompleted](#onresumeattemptcompleted)
     - [removeResumeAttemptCompletedHook](#removeresumeattemptcompletedhook)
@@ -134,6 +135,12 @@ Using types is optional.
 `Roles.restrictedLogin(token, cb)` (client)
 
 See [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)
+
+### isInRoleWhenUnrestricted
+
+`{{isInRoleWhenUnrestricted role group}}` (client)
+
+Template helper, analagous to [isInRole](http://alanning.github.io/meteor-roles/classes/UIHelpers.html), but ignores any current restriction.
 
 ### Advanced
 

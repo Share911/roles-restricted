@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('1.2.1');
+  api.versionsFrom('1.2');
 
   api.use(['ecmascript',
            'underscore',
@@ -30,6 +30,7 @@ Package.onUse(function(api) {
                 'server/loginHooks.js'], 'server');
 
   api.addFiles(['client/roles-restricted.js',
+                'client/templateHelpers.js',
                 'client/loginHooks.js'], 'client');
 });
 
