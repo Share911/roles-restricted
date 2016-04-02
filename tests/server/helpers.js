@@ -33,7 +33,12 @@ Meteor.methods({
 
 Meteor.publish('test', function() {
   // l('connection: ', DDP._CurrentInvocation.get(), this.userId, this.connection._roles)
-  l('TEST PUBLISH:', ! Roles.userIsInRole(this.userId, ['admin'], 'group1', this))
+
+  if (Roles.userIsInRole(this.userId, ['admin'], 'group1', this))
+    console.log('publish test FAILED')
+  else
+    console.log('publish test success')
+
   // let user = Meteor.users.findOne(this.userId)
   // if (user)
   //   l('user.roles', user.roles)

@@ -107,15 +107,46 @@ Tinytest.addAsync(
 
       Roles.restrictedLogin(token, function (e) {
         Meteor.call('serverConnId', function(e, r) {
-          l('*****', e, targetId, r)
-          
           // Meteor.loginWithPassword('a@b', 'a', function() {
           sub = Meteor.subscribe('test')
           sub.stop()
-          // check server log to verify 'TEST PUBLISH: true'
+          // check server log to verify 'publish test success'
           done()
         })
       })
     })
   })
 
+
+Tinytest.addAsync(
+  'roles-restricted - restricts on reconnect',
+  function (test, done) {
+    createUserAndToken(restriction, function(targetId, token) {
+      test.isNull(Meteor.userId())
+
+      Roles.restrictedLogin(token, function (e) {
+        test.isUndefined(e)
+        test.equal(Meteor.userId(), targetId)
+
+        test.isFalse(Roles.isUnrestricted())
+
+        Meteor.disconnect()
+
+        existingHook = Meteor.connection.onReconnect
+        Meteor.connection.onReconnect = function() {
+          existingHook()
+
+          test.isTrue(Accounts.loggingIn())
+
+          setTimeout(function(){
+            test.equal(Meteor.userId(), targetId)
+            test.isFalse(Roles.isUnrestricted())
+            test.isNotUndefined(Meteor.connection._roles.restrictedRoles)
+            done()
+          }, 1000)
+        }
+
+        Meteor.reconnect()
+      })
+    })
+  })

@@ -5,10 +5,13 @@ _.extend(Roles, {
       if (! error)
         Roles.restrict(data)
 
-      cb(error, data)
+      if (cb)
+        cb(error, data)
     })
   },
 
   setDefaultExpirationInSeconds() {} // server-only
 
 })
+
+LoginLinks.connectionLoginReconnect = Roles.restrictedLogin

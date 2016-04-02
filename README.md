@@ -94,7 +94,7 @@ When a login is attempted with a token that is expired, a `'login-links/token-ex
 
 You can configure expiration in three ways:
 
-- globally: `Roles.setDefaultExpirationInSeconds(60 * 60); // one hour`
+- globally: `Roles.setDefaultExpirationInSeconds(60 * 60); // one hour` (call from both client and server)
 - per [type](#setrestrictiontypes)
 - per [token](#generaterestrictedaccesstoken)
 
@@ -155,7 +155,7 @@ Roles.setRestrictionTypes({
 Roles.generateRestrictedAccessToken(alice, {type: 'typeName1'});
 ```
 
-Using types is optional.
+Using types is optional. If used, call from both server and client.
 
 ### generateRestrictedAccessToken
 
