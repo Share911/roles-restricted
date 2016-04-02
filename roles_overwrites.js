@@ -20,10 +20,10 @@ let normalizedUser = function(user, context) {
 _.extend(Roles, {
   
   userIsInRole(user, roles, group, context) {
-    l('userIsInRole roles, group: ', roles, group)
+    // l('userIsInRole roles, group: ', roles, group)
+    // l(Roles._BaseRoles.userIsInRole(...arguments), user.roles)
     user = normalizedUser(user, context)
-    // l(Roles._BaseRoles.userIsInRole(...arguments), user)
-    l('normalizedUser.roles', user.roles)
+    // l('normalizedUser.roles', user && user.roles)
     return Roles._BaseRoles.userIsInRole(user, roles, group)
   },
 

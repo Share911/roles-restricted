@@ -55,7 +55,7 @@ _.extend(Roles, {
   determineRoles(user, context) {
     let conn = null
 
-    // l('determineRoles', user, conn)
+    // l('determineRoles', user, context)
     
     if (!user)
       return []
@@ -63,15 +63,19 @@ _.extend(Roles, {
     let currentUser
     if (context) {
       currentUser = context.userId
-      conn = context.connection
+      // inside publish functions, this.connection._userId isn't set
+      context.connection._userId = context.userId
     } else {
       currentUser = Meteor.userId()
     }
 
+    if (context)
+      conn = context.connection
+
     let restriction = Roles.getRestriction(conn)
 
-    l('determineRoles', Roles.isUnrestricted(conn), user._id !== currentUser, user._id, currentUser, conn)
-
+    // l('determineRoles', Roles.isUnrestricted(conn), user._id !== currentUser, user._id, currentUser, conn)
+    
     // restrictions only apply to current user
     if (Roles.isUnrestricted(conn) || (user._id !== currentUser)) {
       return user.roles
@@ -121,14 +125,15 @@ _.extend(Roles, {
   // -- private functions --
 
   _getConnection() {
-    if (Meteor.isServer)
+    if (Meteor.isServer) {
       if (DDP._CurrentInvocation.get()) {
         return DDP._CurrentInvocation.get().connection
       } else {
         throw new Meteor.Error('roles-restricted: if testing roles outside of a method context (for example inside Meteor.publish), you must provide a `context` argument')
       }
-    else
+    } else {
       return Meteor.connection
+    }
   },
   
   _unrestrictConnection(conn) {
