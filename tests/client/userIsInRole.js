@@ -91,8 +91,6 @@ Tinytest.add(
   })
 
 
-
-
 // -- unrestricted --
 
 function testUnrestrictedUser (test, username, expectedRoles, group) {

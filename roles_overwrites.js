@@ -1,4 +1,5 @@
-let normalizedUser = function(user) {
+let normalizedUser = function(user, context) {
+  // l('normalizedUser', conn)
   if ('string' === typeof user) {
     user = Meteor.users.findOne(
       {_id: user},
@@ -7,23 +8,27 @@ let normalizedUser = function(user) {
     // don't mutate the object given
     user = _.clone(user)
   }
+
+  if (!user)
+    return null
   
-  user.roles = Roles.determineRoles(user)
+  user.roles = Roles.determineRoles(user, context)
 
   return user
 }
 
 _.extend(Roles, {
   
-  userIsInRole(user, roles, group) {
-    // l('args', ...arguments)
-    // l(Roles._BaseRoles.userIsInRole(...arguments))
-    user = normalizedUser(user)
+  userIsInRole(user, roles, group, context) {
+    l('userIsInRole roles, group: ', roles, group)
+    user = normalizedUser(user, context)
+    // l(Roles._BaseRoles.userIsInRole(...arguments), user)
+    l('normalizedUser.roles', user.roles)
     return Roles._BaseRoles.userIsInRole(user, roles, group)
   },
 
-  getRolesForUser(user, group) {
-    user = normalizedUser(user)
+  getRolesForUser(user, group, context) {
+    user = normalizedUser(user, context)
     return Roles._BaseRoles.getRolesForUser(user, group)
   }
 

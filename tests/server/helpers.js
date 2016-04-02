@@ -10,7 +10,7 @@ Meteor.methods({
   },
 
   serverConnId() {
-    l('serverConnId: ', DDP._CurrentInvocation.get().connection.id)
+    l('serverConnId: ', DDP._CurrentInvocation.get().connection)
     return DDP._CurrentInvocation.get().connection.id
   },
 
@@ -29,4 +29,12 @@ Meteor.methods({
     return Roles.generateRestrictedAccessToken(userId, opts)
   }
 
+})
+
+Meteor.publish('test', function() {
+  // l('connection: ', DDP._CurrentInvocation.get(), this.userId, this.connection._roles)
+  l('TEST PUBLISH:', ! Roles.userIsInRole(this.userId, ['admin'], 'group1', this))
+  // let user = Meteor.users.findOne(this.userId)
+  // if (user)
+  //   l('user.roles', user.roles)
 })

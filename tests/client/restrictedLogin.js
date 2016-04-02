@@ -98,3 +98,24 @@ Tinytest.addAsync(
     })
   }
 )
+
+Tinytest.addAsync(
+  "roles-restricted - works inside publication",
+  function (test, done) {
+    createUserAndToken(restriction, function(targetId, token) {
+      test.isNull(Meteor.userId())
+
+      Roles.restrictedLogin(token, function (e) {
+        Meteor.call('serverConnId', function(e, r) {
+          l('*****', e, targetId, r)
+          
+          // Meteor.loginWithPassword('a@b', 'a', function() {
+          sub = Meteor.subscribe('test')
+          sub.stop()
+          // check server log to verify 'TEST PUBLISH: true'
+          done()
+        })
+      })
+    })
+  })
+

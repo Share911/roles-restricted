@@ -1,9 +1,10 @@
 Meteor package that adds a restricted-access state and autologin links to [alanning:roles](https://github.com/alanning/meteor-roles/).
 
-The main use case is sending an email or sms to your user with a link to your app that contains an OTP (one-time password) that automatically logs them in (so they don't have to enter their username/password or do oauth):
+The main use case is sending an email or sms to your user with a link to your app that contains an OTP (one-time password) that automatically logs them in (so they don't have to enter their username/password or do OAuth):
 
 ```
-Josh Owens just commented on your post: https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a
+Josh Owens just commented on your blog post:
+https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a
 ```
 
 If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL). You use both packages together, as long as you use different type names and call `LoginLinks.setTypes` before `Roles.setRestrictionTypes`.
@@ -14,6 +15,7 @@ If you want the user to be fully logged in, use the package [loren:login-links](
 - [Configuration](#configuration)
   - [Restrictions](#restrictions)
   - [Expiration](#expiration)
+- [Changes to Roles package](#changes-to-roles-package)
 - [API](#api)
   - [setRestrictionTypes](#setrestrictiontypes)
   - [generateRestrictedAccessToken](#generaterestrictedaccesstoken)
@@ -86,8 +88,6 @@ The roles a user has in a restricted state is the intersection of the restricted
 Roles.generateRestrictedAccessToken(alice, {roles: ['user', 'editor']});
 ```
 
-The restricted roles are used for `Roles.userIsInRole(user, role)` when `user` is the logged-in user, as well as `Roles.getRolesForUser` and the `isInRole` UI helper. They are __not__ used for `getUsersInRole` or `getGroupsForUser` - those and all other functions remain unchanged from the base Roles package.
-
 ### Expiration
 
 When a login is attempted with a token that is expired, a `'login-links/token-expired'` error will be thrown. The default token expiration is one day. 
@@ -97,6 +97,46 @@ You can configure expiration in three ways:
 - globally: `Roles.setDefaultExpirationInSeconds(60 * 60); // one hour`
 - per [type](#setrestrictiontypes)
 - per [token](#generaterestrictedaccesstoken)
+
+## Changes to Roles package
+
+The restricted roles are used for `Roles.userIsInRole(user, roles, [group])` when `user` is the logged-in user, as well as `Roles.getRolesForUser(user, [group])` and the `isInRole` UI helper. They are __not__ used for `getUsersInRole` or `getGroupsForUser` - those and all other functions remain unchanged from the base Roles package.
+
+Restriction information is stored on the DDP connection. When you check roles inside of methods, it's easy for `roles-restricted` to access the connection. However, when you check roles outside of a method context, you must pass the context as a final parameter.
+
+- `userIsInRole(user, roles, [group], [context])`
+- `getRolesForUser(user, [group], [context]`
+
+For instance inside of a publish function:
+
+```javascript
+Meteor.publish('data', function() {
+  Roles.userIsInRole(user, ['editor'], null, this)
+  Roles.userIsInRole(user, null, this)
+})
+```
+
+If you don't have a publish context, then you can create an object to pass in:
+
+```javascript
+{
+  userId: String
+  connection: {
+    _roles: {
+      unrestricted: true
+    }
+    OR
+    _roles: {
+      restrictedRoles: {
+        roles: ['user']
+        group: 'group1'
+      }
+    }
+  }
+}
+```
+
+The roles will be restricted if `user` matches `context.userId` and `context.connection._roles.unrestricted` is not true.
 
 ## API
 
