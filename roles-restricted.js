@@ -113,13 +113,11 @@ _.extend(Roles, {
     
     this._restrictionTypes = types
 
-    if (Meteor.isServer) {
-      // don't call setTypes in case LoginLinks package is also used
-      // (we'd be overwriting)
-      // 
-      // extra data in type objects doesn't matter
-      _.extend(LoginLinks._accessTokenTypes, types) 
-    }
+    // don't call setTypes in case LoginLinks package is also used
+    // (we'd be overwriting)
+    // 
+    // extra data in type objects doesn't matter
+    _.extend(LoginLinks._accessTokenTypes, types) 
   },
   
   // -- private functions --
