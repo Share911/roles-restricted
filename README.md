@@ -9,6 +9,8 @@ https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9
 
 If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL). You use both packages together, as long as you use different type names and call `LoginLinks.setTypes` before `Roles.setRestrictionTypes`.
 
+## Contents
+
 - [Basic usage](#basic-usage)
   - [On server](#on-server)
   - [Then on client](#then-on-client)

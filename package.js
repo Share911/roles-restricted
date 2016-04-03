@@ -16,7 +16,7 @@ Package.onUse(function(api) {
            'reactive-var',
            'random',
            'ddp',
-           'loren:login-links',
+           'loren:login-links@0.1.0',
            'alanning:roles@1.2.15'])
 
   api.export('Roles');
