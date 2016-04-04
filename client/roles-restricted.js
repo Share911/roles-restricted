@@ -10,7 +10,7 @@ _.extend(Roles, {
     })
   },
 
-  setDefaultExpirationInSeconds() {} // server-only
+  _setupOnReconnectHook: LoginLinks._setupHook
 
 })
 

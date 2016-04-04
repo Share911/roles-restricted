@@ -100,6 +100,25 @@ Tinytest.addAsync(
 )
 
 Tinytest.addAsync(
+  'roles-restricted - works server-side',
+  function (test, done) {
+    createUserAndToken(restriction, function(targetId, token) {
+      Roles.restrictedLogin(token, function (e) {
+        Meteor.call('getRolesForUser', targetId, 'group1', function(e, r) {
+          test.equal(r, ['user'])
+          Meteor.call('getRolesForUser', targetId, 'group2', function(e, r) {
+            test.equal(r, [])
+            Meteor.call('getRolesForUser', targetId, function(e, r) {
+              test.equal(r, [])
+              done()
+            })
+          })
+        })
+      })
+    })
+  })
+
+Tinytest.addAsync(
   "roles-restricted - works inside publication",
   function (test, done) {
     createUserAndToken(restriction, function(targetId, token) {
@@ -131,6 +150,11 @@ Tinytest.addAsync(
         test.isFalse(Roles.isUnrestricted())
 
         Meteor.disconnect()
+
+        // re-setup hook because might have been overwritten by
+        // loginWithPassword in previous test
+        Meteor.connection.onReconnect = null
+        Roles._setupOnReconnectHook()
 
         existingHook = Meteor.connection.onReconnect
         Meteor.connection.onReconnect = function() {

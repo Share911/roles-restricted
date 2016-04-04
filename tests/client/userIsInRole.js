@@ -120,6 +120,13 @@ Tinytest.add(
     testUnrestrictedUser(test, 'joe', ['user', 'editor', 'admin'], 'group1')
   })
 
+Tinytest.add(
+  'roles-restricted - passing {unrestricted: true} as the context works',
+  function (test) {
+    Roles._clearUnrestriction()
+    test.isTrue(Roles.userIsInRole(users.joe, 'admin', null, {unrestricted: true}))
+  })
+
 
 // -- from alanning:roles --
 

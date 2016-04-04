@@ -14,6 +14,8 @@ _.extend(Roles, {
 
   _BaseRoles,
 
+  setDefaultExpirationInSeconds: LoginLinks.setDefaultExpirationInSeconds,
+
   isUnrestricted(conn) {
     conn || (conn = this._getConnection())
     return conn._userId && conn._roles && conn._roles.unrestricted
@@ -60,17 +62,29 @@ _.extend(Roles, {
     if (!user)
       return []
 
-    let currentUser
+    let currentUser = null
     if (context) {
-      currentUser = context.userId
-      // inside publish functions, this.connection._userId isn't set
-      context.connection._userId = context.userId
+      if (context.unrestricted) {
+        conn = {
+          connection: {
+            _userId: 'bypass-userId-check',
+            _roles: {unrestricted: true}
+          }
+        }
+        
+      } else {
+        // inside publish functions, this.connection._userId isn't set
+        context.connection._userId = context.userId
+        conn = context.connection
+        currentUser = context.userId
+      }
     } else {
-      currentUser = Meteor.userId()
+      try {
+        currentUser = Meteor.userId()
+      } catch(e) {
+        throw new Meteor.Error('roles-restricted: must provide context argument when checking roles outside of a normal method context')
+      }
     }
-
-    if (context)
-      conn = context.connection
 
     let restriction = Roles.getRestriction(conn)
 

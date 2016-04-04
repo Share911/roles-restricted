@@ -118,7 +118,7 @@ Meteor.publish('data', function() {
 })
 ```
 
-If you don't have a publish context, then you can create an object to pass in:
+If you don't have a publish context, then you can use `{unrestricted: true}` to do a check that assumes the user is unrestricted, or you can create an object to pass in:
 
 ```javascript
 {

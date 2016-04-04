@@ -1,6 +1,6 @@
 Package.describe({
   name: 'loren:roles-restricted',
-  version: '0.1.0',
+  version: '0.1.1',
   summary: 'Adds restricted-access state and autologin links to alanning:roles',
   git: 'https://github.com/lorensr/roles-restricted.git'
 });
@@ -43,7 +43,8 @@ Package.onTest(function(api) {
 
   api.addFiles(['tests/helpers.js'])
 
-  api.addFiles(['tests/server/helpers.js'], 'server');
+  api.addFiles(['tests/server/helpers.js',
+                'tests/server/determineRoles.js'], 'server');
 
   api.addFiles(['tests/client/helpers.js',
                 'tests/client/restrictedLogin.js',

@@ -24,6 +24,10 @@ Meteor.methods({
     return roles
   },
 
+  getRolesForUser(user, group) {
+    return Roles.getRolesForUser(user, group)
+  },
+
   setRolesAndGenerateToken(userId, roles, opts) {
     Meteor.users.update(userId, {$set: {roles}})
     return Roles.generateRestrictedAccessToken(userId, opts)
