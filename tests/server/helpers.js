@@ -25,6 +25,7 @@ Meteor.methods({
   },
 
   getRolesForUser(user, group) {
+    // l('getRoles', DDP._CurrentInvocation.get().connection, user, Meteor.users.findOne(user))
     return Roles.getRolesForUser(user, group)
   },
 

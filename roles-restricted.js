@@ -18,7 +18,23 @@ _.extend(Roles, {
 
   isUnrestricted(conn) {
     conn || (conn = this._getConnection())
-    return conn._userId && conn._roles && conn._roles.unrestricted
+
+    if (conn._roles && conn._roles.unrestricted) {
+      if (conn._userId) {
+        return true
+      } else {
+        // when conn._userId isn't set, check Meteor.userId() 
+        let user = null
+        try {
+          user = Meteor.userId()
+        } catch(e) {
+          return false
+        }
+        return !! user
+      }
+    } else {
+      return false
+    }
   },
 
   restrict({type, roles, group}) {
@@ -154,6 +170,9 @@ _.extend(Roles, {
 
     if (!conn._roles)
       conn._roles = {}
+    else
+      delete conn._roles.restrictedRoles
+    
     conn._roles.unrestricted = true
   },
 

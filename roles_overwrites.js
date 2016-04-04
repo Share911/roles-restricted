@@ -1,5 +1,5 @@
 let normalizedUser = function(user, context) {
-  // l('normalizedUser', conn)
+  l('normalizedUser', user, context)
   if ('string' === typeof user) {
     user = Meteor.users.findOne(
       {_id: user},

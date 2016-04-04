@@ -39,14 +39,22 @@ Tinytest.addAsync(
 
         test.isFalse(Roles.isUnrestricted())
 
-        Meteor.loginWithPassword('a@b', 'a', function() {
-          test.isTrue(Roles.isUnrestricted())
-          
-          test.equal(Roles.getRolesForUser(targetId, 'group1'), ['user', 'admin'])
-          test.equal(Roles.getRolesForUser(targetId, 'group2'), ['user'])
-          test.equal(Roles.getRolesForUser(targetId), [])
+        Meteor.call('getRolesForUser', targetId, 'group1', function(e, r) {
+          test.equal(r, ['user'])
 
-          done()
+          Meteor.loginWithPassword('a@b', 'a', function() {
+            test.isTrue(Roles.isUnrestricted())
+            
+            test.equal(Roles.getRolesForUser(targetId, 'group1'), ['user', 'admin'])
+            test.equal(Roles.getRolesForUser(targetId, 'group2'), ['user'])
+            test.equal(Roles.getRolesForUser(targetId), [])
+
+            Meteor.call('getRolesForUser', targetId, 'group1', function(e, r) {
+              test.equal(r, ['user', 'admin'])
+              
+              done()
+            })
+          })
         })
       })
     })
@@ -149,28 +157,38 @@ Tinytest.addAsync(
 
         test.isFalse(Roles.isUnrestricted())
 
-        Meteor.disconnect()
+        Meteor.call('getRolesForUser', targetId, 'group1', function(e, r) {
+          test.equal(r, ['user'])
 
-        // re-setup hook because might have been overwritten by
-        // loginWithPassword in previous test
-        Meteor.connection.onReconnect = null
-        Roles._setupOnReconnectHook()
 
-        existingHook = Meteor.connection.onReconnect
-        Meteor.connection.onReconnect = function() {
-          existingHook()
+          Meteor.disconnect()
 
-          test.isTrue(Accounts.loggingIn())
+          // re-setup hook because might have been overwritten by
+          // loginWithPassword in previous test
+          Meteor.connection.onReconnect = null
+          Roles._setupOnReconnectHook()
 
-          setTimeout(function(){
-            test.equal(Meteor.userId(), targetId)
-            test.isFalse(Roles.isUnrestricted())
-            test.isNotUndefined(Meteor.connection._roles.restrictedRoles)
-            done()
-          }, 1000)
-        }
+          existingHook = Meteor.connection.onReconnect
+          Meteor.connection.onReconnect = function() {
+            existingHook()
 
-        Meteor.reconnect()
+            test.isTrue(Accounts.loggingIn())
+
+            setTimeout(function(){
+              test.equal(Meteor.userId(), targetId)
+              test.isFalse(Roles.isUnrestricted())
+              test.isNotUndefined(Meteor.connection._roles.restrictedRoles)
+
+              Meteor.call('getRolesForUser', targetId, 'group1', function(e, r) {
+                test.equal(r, ['user'])
+                
+                done()
+              })
+            }, 1000)
+          }
+
+          Meteor.reconnect()
+        })
       })
     })
   })
