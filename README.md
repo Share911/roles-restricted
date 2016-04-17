@@ -7,7 +7,7 @@ Josh Owens just commented on your blog post:
 https://my-blog-app.com/post/abc?comment=3?token=A10F51nigkFsShxmvkLnlQ76Kzjh7h9pMuNxpVpO81a
 ```
 
-If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)) - and is tab-specific (other tabs in the same browser will not be logged in unless they also have the token in the URL). You can use both packages together, as long as you use different type names and call `LoginLinks.setTypes` before `Roles.setRestrictionTypes`.
+If you want the user to be fully logged in, use the package [loren:login-links](https://github.com/lorensr/login-links.git). If you want the user to be temporarily logged in with restricted permissions, use this package. The login is temporary - it only lasts for the duration of the DDP connection (it uses [login-links connectionLogin](https://github.com/lorensr/login-links#connectionlogin)). You can use both packages together, as long as you use different type names and call `LoginLinks.setTypes` before `Roles.setRestrictionTypes`.
 
 ## Contents
 
@@ -175,7 +175,7 @@ Using types is optional. If used, call from both server and client.
   - `group: String` (if you use groups)
   - `expiresInSeconds: Integer` (optional)
 
-`opts` must include either `type` or `roles`. 
+`opts` must include either `type` or `roles`. The token is 43 alphanumeric characters, and only the hashed version is stored in the DB.
 
 ### restrictedLogin
 
@@ -209,7 +209,7 @@ if (! Meteor.userId())
   Roles.restrictedLogin(token, cb);
 ```
 
-`Meteor.userId()` is optimistically set at pageload when Meteor is in the process of doing a resume login. In some cases - if the resume token has expired or been removed from the database (for instance by [Meteor.logoutOtherClients](http://docs.meteor.com/#/full/meteor_logoutotherclients)), then the resume login will fail, and `Meteor.userId()` will be set to null. To handle these cases, you can do the following:
+`Meteor.userId()` is optimistically set by Meteor at pageload when Meteor is in the process of doing a resume login. In some cases - if the resume token has expired or been removed from the database (for instance by [Meteor.logoutOtherClients](http://docs.meteor.com/#/full/meteor_logoutotherclients)), then the resume login will fail, and `Meteor.userId()` will be set to null. To handle these cases, you can do the following:
 
 ```javascript
 token = // get from URL
@@ -263,6 +263,6 @@ open localhost:3000
 
 ## Credits
 
-Thanks to Share911 for sponsoring. [share911.com](https://share911.com/) - An emergency response system for your organization.
+Thanks to Share911 for sponsoring. [share911.com](https://share911.com/) – an emergency response system for your organization.
 
 [Contributors](https://github.com/lorensr/roles-restricted/graphs/contributors)
