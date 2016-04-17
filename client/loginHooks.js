@@ -1,5 +1,10 @@
 let LoginHooks = new Meteor.Collection('roles-restricted/login-hooks')
 
+/**
+ * If it was an event from a successful login, and if the userId matches, then
+unrestrict login
+ * @param {object} data - login event data
+ */
 let maybeUnrestrictLogin = function({loggedIn, userId}) {
   if (loggedIn) {
     let isCorrectUser = userId === Meteor.userId()

@@ -1,9 +1,13 @@
 _.extend(Roles, {
 
-  // modified from Roles._uiHelpers.isInRole
-  // https://github.com/alanning/meteor-roles/blob/master/roles/client/uiHelpers.js#L45
-  //
-  // added `._BaseRoles`
+  /**
+   * Check whether the current user is in the given role, assuming the user is unrestricted.
+   * Modified from `Roles._uiHelpers.isInRole`:
+   * https://github.com/alanning/meteor-roles/blob/master/roles/client/uiHelpers.js#L45
+   * (added `._BaseRoles`)
+   * @param {string} role
+   * @param {string} group
+   */
   isInRoleWhenUnrestricted(role, group) {
     var user = Meteor.user(),
         comma = (role || '').indexOf(','),

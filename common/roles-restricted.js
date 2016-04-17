@@ -16,6 +16,10 @@ _.extend(Roles, {
 
   setDefaultExpirationInSeconds: LoginLinks.setDefaultExpirationInSeconds,
 
+  /**
+   * Determine whether the connection is currently in an unrestricted state
+   * @param {object} conn - in general, `DDP._CurrentInvocation.get().connection` on server or `Meteor.connection` on client
+   */
   isUnrestricted(conn) {
     conn || (conn = this._getConnection())
 
@@ -37,6 +41,10 @@ _.extend(Roles, {
     }
   },
 
+  /**
+   * Restrict the current connection
+   * @param {object} config - `group` and either `type` or `roles`
+   */
   restrict({type, roles, group}) {
     let conn = this._getConnection()
 
@@ -70,6 +78,10 @@ _.extend(Roles, {
     }
   },
 
+  /**
+   * @param {object} user - with `_id` and `roles`
+   * @param {object} context - Usually `DDP._CurrentInvocation.get()`. Contains the current user's id and the connection.
+   */
   determineRoles(user, context) {
     let conn = null
 

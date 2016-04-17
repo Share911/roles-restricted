@@ -18,6 +18,7 @@ If you want the user to be fully logged in, use the package [loren:login-links](
   - [Restrictions](#restrictions)
   - [Expiration](#expiration)
 - [Changes to Roles package](#changes-to-roles-package)
+- [Security note](#security-note)
 - [API](#api)
   - [setRestrictionTypes](#setrestrictiontypes)
   - [generateRestrictedAccessToken](#generaterestrictedaccesstoken)
@@ -139,6 +140,10 @@ If you don't have a publish context, then you can use `{unrestricted: true}` to 
 ```
 
 The roles will be restricted if `user` matches `context.userId` and `context.connection._roles.unrestricted` is not true.
+
+## Security note
+
+See [login-links security note](https://github.com/lorensr/login-links#security-note).
 
 ## API
 
