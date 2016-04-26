@@ -263,6 +263,7 @@ open localhost:3000
 
 ## Credits
 
-Thanks to Share911 for sponsoring. [share911.com](https://share911.com/) – an emergency response system for your organization.
+Thanks to Share911 for sponsoring 👏
+[share911.com](https://share911.com/) – the best emergency response system for your organization.
 
 [Contributors](https://github.com/lorensr/roles-restricted/graphs/contributors)
