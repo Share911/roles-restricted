@@ -59,8 +59,12 @@ let handleLoginEvent = function({connection, type, user}, loggedIn) {
   l('handleLoginEvent', loggedIn, type, connId)
 
   let data = {loggedIn, type, connId}
-  if (loggedIn)
+  if (loggedIn) {
+    if (!user) {
+      l('TODO when does this happen?', type, user)
+    }
     data.userId = user._id
+  }
 
   if (publisher) {
     l('adding data directly to publisher:', data, connId)

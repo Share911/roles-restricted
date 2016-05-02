@@ -44,6 +44,12 @@ Meteor.publish('test', function() {
   else
     console.log('publish test success')
 
+  if (Roles.isUnrestrictedFromPublish(this))
+    console.log('publish test 2 FAILED')
+  else
+    console.log('publish test 2 success')
+    
+
   // let user = Meteor.users.findOne(this.userId)
   // if (user)
   //   l('user.roles', user.roles)

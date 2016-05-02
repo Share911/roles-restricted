@@ -237,6 +237,8 @@ Roles.removeResumeAttemptCompletedHook(hook)
 
 See whether the current connection is in a restricted state or not.
 
+From inside a publish function, instead use `Roles.isUnrestrictedFromPublish(this)`.
+
 #### restrict
 
 `Roles.restrict(opts)`

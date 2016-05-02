@@ -42,6 +42,14 @@ _.extend(Roles, {
   },
 
   /**
+   * Determine from a publisher whether the connection is currently in an unrestricted state
+   * @param {object} context - `this` inside a publish function
+   */
+  isUnrestrictedFromPublish(context) {
+    return this.isUnrestricted(this._getConnectionFromPublish(context))
+  },
+
+  /**
    * Restrict the current connection
    * @param {object} config - `group` and either `type` or `roles`
    */
@@ -101,10 +109,8 @@ _.extend(Roles, {
         }
         
       } else {
-        // inside publish functions, this.connection._userId isn't set
-        context.connection._userId = context.userId
-        conn = context.connection
-        currentUser = context.userId
+        conn = this._getConnectionFromPublish(context)
+        currentUser = conn._userId
       }
     } else {
       try {
@@ -176,6 +182,12 @@ _.extend(Roles, {
     }
   },
   
+  // inside publish functions, this.connection._userId isn't set
+  _getConnectionFromPublish(context) {
+    context.connection._userId = context.userId
+    return context.connection
+  },
+
   _unrestrictConnection(conn) {
     l('unrestricted')
     conn || (conn = this._getConnection())
