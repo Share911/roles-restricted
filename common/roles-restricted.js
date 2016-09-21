@@ -23,7 +23,7 @@ _.extend(Roles, {
   isUnrestricted(conn) {
     conn || (conn = this._getConnection())
 
-    if (conn._roles && conn._roles.unrestricted) {
+    if (conn && conn._roles && conn._roles.unrestricted) {
       if (conn._userId) {
         return true
       } else {
