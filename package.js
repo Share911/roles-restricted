@@ -1,6 +1,6 @@
 Package.describe({
   name: 'loren:roles-restricted',
-  version: '0.1.4',
+  version: '0.1.5',
   summary: 'Adds restricted-access state and autologin links to alanning:roles',
   git: 'https://github.com/lorensr/roles-restricted.git'
 });
@@ -16,7 +16,7 @@ Package.onUse(function(api) {
            'reactive-var',
            'random',
            'ddp',
-           'loren:login-links@0.1.2',
+           'loren:login-links@0.1.3',
            'alanning:roles@1.2.15'])
 
   api.export('Roles');
