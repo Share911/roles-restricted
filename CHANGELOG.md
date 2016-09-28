@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.1.5] - 2016-09-28
 ### Fixed
 - Add check to avoid common error when first connecting (#2)
+
 ### Updated
 - `login-links@0.1.3`
 
