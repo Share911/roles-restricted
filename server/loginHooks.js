@@ -3,7 +3,7 @@ let publishers = {}
 
 // a resume event can occur before the publisher is added to publishers,
 // so until it is, add to the queue
-// 
+//
 // map of connection ids -> array of docs to publish
 let publishQueue = {
   add(connection, doc) {
@@ -26,15 +26,17 @@ let publishQueue = {
   }
 }
 
-    
+
 Meteor.publish('roles-restricted/login-hooks', function () {
+  this.unblock()
+
   let connId = this.connection.id
   l('publishing login hooks for connId:', connId)
 
   publishers[connId] = this
 
   let queue = publishQueue[connId]
-  if (queue) 
+  if (queue)
     for (doc of queue) {
       l('adding from queue', connId, doc)
       this.added('roles-restricted/login-hooks', Random.id(), doc)

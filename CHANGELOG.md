@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.6] - 2018-03-28
+- Fix "Error: TypeError: undefined is not an object (evaluating 'r.roles[i.group]')"
+
 ## [0.1.5] - 2016-09-28
 ### Fixed
 - Add check to avoid common error when first connecting (#2)

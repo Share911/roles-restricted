@@ -11,14 +11,14 @@ let normalizedUser = function(user, context) {
 
   if (!user)
     return null
-  
+
   user.roles = Roles.determineRoles(user, context)
 
   return user
 }
 
 _.extend(Roles, {
-  
+
   userIsInRole(user, roles, group, context) {
     // l('userIsInRole roles, group: ', roles, group)
     // l(Roles._BaseRoles.userIsInRole(...arguments), user.roles)

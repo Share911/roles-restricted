@@ -27,7 +27,7 @@ _.extend(Roles, {
       if (conn._userId) {
         return true
       } else {
-        // when conn._userId isn't set, check Meteor.userId() 
+        // when conn._userId isn't set, check Meteor.userId()
         let user = null
         try {
           user = Meteor.userId()
@@ -75,7 +75,7 @@ _.extend(Roles, {
 
     conn._roles.restrictedRoles.roles = roles
   },
-  
+
   getRestriction(conn) {
     conn || (conn = this._getConnection())
 
@@ -94,7 +94,7 @@ _.extend(Roles, {
     let conn = null
 
     // l('determineRoles', user, context)
-    
+
     if (!user)
       return []
 
@@ -107,7 +107,7 @@ _.extend(Roles, {
             _roles: {unrestricted: true}
           }
         }
-        
+
       } else {
         conn = this._getConnectionFromPublish(context)
         currentUser = conn._userId
@@ -116,21 +116,21 @@ _.extend(Roles, {
       try {
         currentUser = Meteor.userId()
       } catch(e) {
-        throw new Meteor.Error('roles-restricted: must provide context argument when checking roles outside of a normal method context')
+        throw new Error('roles-restricted: must provide context argument when checking roles outside of a normal method context')
       }
     }
 
     let restriction = Roles.getRestriction(conn)
 
     // l('determineRoles', Roles.isUnrestricted(conn), user._id !== currentUser, user._id, currentUser, conn)
-    
+
     // restrictions only apply to current user
     if (Roles.isUnrestricted(conn) || (user._id !== currentUser)) {
       return user.roles
     } else if (restriction) {
       if (restriction.group) {
         let roles = {}
-        let userRoles = user.roles[restriction.group]
+        let userRoles = user.roles ? user.roles[restriction.group] : []
         // l('userRoles', user, restriction, _.intersection(userRoles, restriction.roles))
 
         roles[restriction.group] = _.intersection(userRoles, restriction.roles)
@@ -158,16 +158,16 @@ _.extend(Roles, {
         expirationInSeconds: Match.Optional(Match.Integer)
       }, 'incorrect setRestrictionTypes format')
     }
-    
+
     this._restrictionTypes = types
 
     // don't call setTypes in case LoginLinks package is also used
     // (we'd be overwriting)
-    // 
+    //
     // extra data in type objects doesn't matter
-    _.extend(LoginLinks._accessTokenTypes, types) 
+    _.extend(LoginLinks._accessTokenTypes, types)
   },
-  
+
   // -- private functions --
 
   _getConnection() {
@@ -175,13 +175,13 @@ _.extend(Roles, {
       if (DDP._CurrentInvocation.get()) {
         return DDP._CurrentInvocation.get().connection
       } else {
-        throw new Meteor.Error('roles-restricted: if testing roles outside of a method context (for example inside Meteor.publish), you must provide a `context` argument')
+        throw new Error('roles-restricted: if testing roles outside of a method context (for example inside Meteor.publish), you must provide a `context` argument')
       }
     } else {
       return Meteor.connection
     }
   },
-  
+
   // inside publish functions, this.connection._userId isn't set
   _getConnectionFromPublish(context) {
     context.connection._userId = context.userId
@@ -196,7 +196,7 @@ _.extend(Roles, {
       conn._roles = {}
     else
       delete conn._roles.restrictedRoles
-    
+
     conn._roles.unrestricted = true
   },
 
