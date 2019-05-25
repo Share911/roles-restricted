@@ -1,12 +1,12 @@
 Package.describe({
-  name: 'loren:roles-restricted',
+  name: 'share911:roles-restricted',
   version: '0.1.6',
   summary: 'Adds restricted-access state and autologin links to alanning:roles',
   git: 'https://github.com/lorensr/roles-restricted.git'
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('1.3.3.1');
+  api.versionsFrom('1.8');
 
   api.use(['ecmascript',
            'underscore',
@@ -39,7 +39,7 @@ Package.onTest(function(api) {
            'tinytest',
            'meteor-base',
            'accounts-password',
-           'loren:roles-restricted']);
+           'share911:roles-restricted']);
 
   api.addFiles(['tests/helpers.js'])
 
