@@ -1,10 +1,14 @@
-Tinytest.addAsync(
-  'roles-restricted - throws context error',
-  function (test, done) {
+import { Meteor } from 'meteor/meteor'
+import { expect } from 'meteor/practicalmeteor:chai'
+
+describe('roles-restricted', function () {
+  it('throws context error', function (done) {
+    const fn = function () {
+      Roles.determineRoles('foo')
+    }
     Meteor.defer(function() {
-      test.throws(function () {
-        Roles.determineRoles('foo')
-      }, Error)
+      expect(fn).to.throw()
       done()
     })
   })
+})

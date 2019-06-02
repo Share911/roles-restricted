@@ -23,7 +23,27 @@ login = function(cb){
       password: 'a'
     }, function(){
       // wait for unrestriction to occur
-      Meteor.defer(cb)
+      Meteor.setTimeout(cb, 300)
     })
   })
+}
+
+/**
+ * Compare simple array contents (strings, numbers)
+ */
+export function arraysEqual (arr1, arr2) {
+  if (!arr1 || !arr2) {
+    return false
+  }
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+  for (let i = 0, len = arr1.length; i < len; i++) {
+    const elem1 = arr1[i]
+    const elem2 = arr2[i]
+    if (elem1 !== elem2) {
+      return false
+    }
+  }
+  return true
 }

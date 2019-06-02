@@ -1,0 +1,11 @@
+{
+  "name": "roles-restricted",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Share911/roles-restricted.git",
+  "author": "alanning <alanning@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "TEST_WATCH=1 meteor test-packages ./ --driver-package meteortesting:mocha"
+  }
+}

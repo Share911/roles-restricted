@@ -16,6 +16,7 @@ Package.onUse(function(api) {
            'reactive-var',
            'random',
            'ddp',
+           'lamhieu:unblock',
            'loren:login-links@0.1.3',
            'alanning:roles@1.2.15'])
 
@@ -35,11 +36,15 @@ Package.onUse(function(api) {
 });
 
 Package.onTest(function(api) {
-  api.use(['ecmascript',
-           'tinytest',
-           'meteor-base',
-           'accounts-password',
-           'share911:roles-restricted']);
+  api.use([
+    'jquery',
+    'ecmascript',
+    'meteor-base',
+    'accounts-password',
+    'share911:roles-restricted',
+    'meteortesting:mocha',
+    'practicalmeteor:chai',
+  ])
 
   api.addFiles(['tests/helpers.js'])
 

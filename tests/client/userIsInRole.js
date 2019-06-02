@@ -1,3 +1,8 @@
+import { Meteor } from 'meteor/meteor'
+import { _ } from 'meteor/underscore'
+import { expect } from 'meteor/practicalmeteor:chai'
+import { arraysEqual } from './helpers'
+
 let roles = ['admin', 'editor', 'user']
 
 let users = {
@@ -22,9 +27,93 @@ let users = {
   }
 }
 
+describe('roles-restricted', function () {
+  this.timeout(5000)
+
+  context('restricted access', function () {
+
+    it('can compare equal arrays', function () {
+      expect(arraysEqual(['user'], ['user'])).to.be.true
+    })
+    it('can compare inequal arrays', function () {
+      expect(arraysEqual(['user'], ['bar'])).to.be.false
+    })
+
+    it('can check if restricted user is in role', function () {
+      testRestrictedUser('eve', ['user'])
+      const actual = Roles.getRolesForUser(users['eve'])
+      expect(arraysEqual(actual, ['user'])).to.be.true
+    })
+
+    it('can check if restricted user is in role by group', function () {
+      testRestrictedUser('bob', ['user'], 'group1')
+      testRestrictedUser('bob', ['user'], 'group2')
+      testRestrictedUser('bob', [], 'group3')
+    })
+
+    it('can check if restricted user is in role with Roles.GLOBAL_GROUP', function () {
+      testRestrictedUser('joe', ['user'], Roles.GLOBAL_GROUP)
+      testRestrictedUser('joe', ['user'], 'group1')
+    })
+
+    it('restricted user is in role with Roles.GLOBAL_GROUP when no group given', function() {
+      Roles.restrict({roles: ['user'], group: Roles.GLOBAL_GROUP})
+      testUser('joe', ['user'])
+    })
+
+
+    it('defaults secure when neither restricted nor unrestricted', function () {
+      // clear connection from previous tests
+      let conn = Meteor.connection
+      delete conn._roles
+
+      conn.setUserId('eve')    
+
+      testUser('eve', [])
+    })
+      
+    it("uses not-logged-in user's full roles", function () {
+      Meteor.connection.setUserId('foo')    
+
+      restriction = {roles: ['user']}
+      Roles.restrict(restriction)
+    
+      testUser('eve', ['user', 'admin'])
+      const actual = Roles.getRolesForUser(users['eve'])
+      expect(arraysEqual(actual, ['user', 'admin'])).to.be.true
+    })
+  })
+
+  context('unrestricted access', function () {
+
+    it('can check if user is in role', function () {
+      testUnrestrictedUser('eve', ['admin', 'user'])
+    })
+
+    it('can check if user is in role by group', function () {
+      testUnrestrictedUser('bob', ['user'], 'group1')
+      testUnrestrictedUser('bob', ['user', 'editor'], 'group2')
+    })
+
+    it('can check if user is in role with Roles.GLOBAL_GROUP', function () {
+      testUnrestrictedUser('joe', ['user', 'admin'])
+      testUnrestrictedUser('joe', ['user', 'admin'], Roles.GLOBAL_GROUP)
+      testUnrestrictedUser('joe', ['user', 'editor', 'admin'], 'group1')
+    })
+
+    it('passing {unrestricted: true} as the context works', function () {
+      Roles._clearUnrestriction()
+      const actual = Roles.userIsInRole(users.joe, 'admin', null, {unrestricted: true})
+      expect(actual).to.be.true
+    })
+
+  })
+})
+
+
 // -- restricted --
 
-function testRestrictedUser (test, username, expectedRoles, group) {
+function testRestrictedUser (username, expectedRoles, group) {
   Meteor.connection.setUserId(username)      
 
   restriction = {roles: ['user']}
@@ -33,118 +122,35 @@ function testRestrictedUser (test, username, expectedRoles, group) {
 
   Roles.restrict(restriction)
   
-  testUser(test, username, expectedRoles, group)
+  testUser(username, expectedRoles, group)
 }
-
-Tinytest.add(
-  'roles-restricted - can check if restricted user is in role',
-  function (test) {
-    testRestrictedUser(test, 'eve', ['user'])
-    test.equal(Roles.getRolesForUser(users['eve']), ['user'])
-  })
-
-Tinytest.add(
-  'roles-restricted - can check if restricted user is in role by group',
-  function (test) {
-    testRestrictedUser(test, 'bob', ['user'], 'group1')
-    testRestrictedUser(test, 'bob', ['user'], 'group2')
-    testRestrictedUser(test, 'bob', [], 'group3')
-  })
-
-Tinytest.add(
-  'roles-restricted - can check if restricted user is in role with Roles.GLOBAL_GROUP',
-  function (test) {
-    testRestrictedUser(test, 'joe', ['user'], Roles.GLOBAL_GROUP)
-    testRestrictedUser(test, 'joe', ['user'], 'group1')
-  })
-
-Tinytest.add(
-  'roles-restricted - restricted user is in role with Roles.GLOBAL_GROUP when no group given',
-  function(test) {
-    Roles.restrict({roles: ['user'], group: Roles.GLOBAL_GROUP})
-    testUser(test, 'joe', ['user'])
-  })
-
-
-Tinytest.add(
-  'roles-restricted - defaults secure when neither restricted nor unrestricted',
-  function (test) {
-    // clear connection from previous tests
-    let conn = Meteor.connection
-    delete conn._roles
-
-    conn.setUserId('eve')    
-
-    testUser(test, 'eve', [])
-  })
-    
-Tinytest.add(
-  "roles-restricted - uses not-logged-in user's full roles",
-  function (test) {
-    Meteor.connection.setUserId('foo')    
-
-    restriction = {roles: ['user']}
-    Roles.restrict(restriction)
-  
-    testUser(test, 'eve', ['user', 'admin'])
-    test.equal(Roles.getRolesForUser(users['eve']), ['user', 'admin'])
-  })
-
 
 // -- unrestricted --
 
-function testUnrestrictedUser (test, username, expectedRoles, group) {
+function testUnrestrictedUser (username, expectedRoles, group) {
   Roles._unrestrictConnection()
   Meteor.connection.setUserId(username)
   testUser(...arguments)
 }
 
-Tinytest.add(
-  'roles-restricted - can check if user is in role',
-  function (test) {
-    testUnrestrictedUser(test, 'eve', ['admin', 'user'])
-  })
-
-Tinytest.add(
-  'roles-restricted - can check if user is in role by group',
-  function (test) {
-    testUnrestrictedUser(test, 'bob', ['user'], 'group1')
-    testUnrestrictedUser(test, 'bob', ['user', 'editor'], 'group2')
-  })
-
-Tinytest.add(
-  'roles-restricted - can check if user is in role with Roles.GLOBAL_GROUP',
-  function (test) {
-    testUnrestrictedUser(test, 'joe', ['user', 'admin'])
-    testUnrestrictedUser(test, 'joe', ['user', 'admin'], Roles.GLOBAL_GROUP)
-    testUnrestrictedUser(test, 'joe', ['user', 'editor', 'admin'], 'group1')
-  })
-
-Tinytest.add(
-  'roles-restricted - passing {unrestricted: true} as the context works',
-  function (test) {
-    Roles._clearUnrestriction()
-    test.isTrue(Roles.userIsInRole(users.joe, 'admin', null, {unrestricted: true}))
-  })
-
-
 // -- from alanning:roles --
 
-function testUser (test, username, expectedRoles, group) {
+function testUser (username, expectedRoles, group) {
   var user = users[username]
 
+  // l("[testUser]", user, expectedRoles, group)
   // test using user object rather than userId to avoid mocking
   _.each(roles, function (role) {
     var expected = _.contains(expectedRoles, role),
         msg = username + ' expected to have \'' + role + '\' permission but does not',
         nmsg = username + ' had un-expected permission ' + role
 
-    l(role, expected)
+    const actual = Roles.userIsInRole(user, role, group)
+    // l(role, expected, actual)
     if (expected) {
-      test.isTrue(Roles.userIsInRole(user, role, group), msg)
+      expect(actual, msg).to.be.true
     } else {
-      test.isFalse(Roles.userIsInRole(user, role, group), nmsg)
+      expect(actual, nmsg).to.be.false
     }
   })
 }
-
