@@ -1,6 +1,6 @@
 Package.describe({
   name: 'share911:roles-restricted',
-  version: '0.1.6',
+  version: '0.1.7',
   summary: 'Adds restricted-access state and autologin links to alanning:roles',
   git: 'https://github.com/lorensr/roles-restricted.git'
 });
@@ -16,7 +16,7 @@ Package.onUse(function(api) {
            'reactive-var',
            'random',
            'ddp',
-           'lamhieu:unblock',
+           'lamhieu:unblock@0.1.0',
            'loren:login-links@0.1.3',
            'alanning:roles@1.2.15'])
 

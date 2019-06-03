@@ -29,7 +29,7 @@ let createUserAndToken = function(opts, cb) {
 
 let restriction = {
   roles: ['user'],
-  group: 'group1'
+  groups: ['group1'],
 }
 
 let _originalReconnectHook
@@ -118,7 +118,7 @@ describe('roles-restricted', function () {
         userOnly: {roles: ['user']}
       })
       
-      createUserAndToken({type: 'userOnly', group: 'group1'}, function(targetId, token) {
+      createUserAndToken({type: 'userOnly', groups: ['group1']}, function(targetId, token) {
         expect(Meteor.userId()).to.be.null
 
         Roles.restrictedLogin(token, function (e) {

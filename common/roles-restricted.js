@@ -51,9 +51,18 @@ _.extend(Roles, {
 
   /**
    * Restrict the current connection
-   * @param {object} config - `group` and either `type` or `roles`
+   * @param {object} config - `groups` and either `type` or `roles`
    */
-  restrict({type, roles, group}) {
+  restrict({type, roles, group, groups}) {
+    if (group && groups) {
+      throw new Error(`[roles-restricted.restrict] Only 'group' _or_ 'groups' argument permitted`)
+    }
+    if (group) {
+      console.warn(`[roles-restricted.restrict] Argument 'group' is deprecated.  Pass 'groups' array argument instead`)
+      console.trace()
+      groups = [group]
+      delete group
+    }
     let conn = this._getConnection()
 
     if (!conn._roles)
@@ -65,13 +74,20 @@ _.extend(Roles, {
     if (type) {
       let typeConfig = Roles._restrictionTypes[type]
       roles = typeConfig.roles
-      if (typeConfig.group)
-        group = typeConfig.group
+      if (typeConfig.groups)
+        groups = typeConfig.groups
     }
 
     conn._roles.restrictedRoles = {}
-    if (group)
-      conn._roles.restrictedRoles.group = group
+    if (groups) {
+      if (typeof groups === 'string') {
+        groups = [groups]
+      }
+      if (!Array.isArray(groups)) {
+        throw new Error(`[roles-restricted.restrict] Argument 'groups' must be an array.`)
+      }
+      conn._roles.restrictedRoles.groups = groups
+    }
 
     conn._roles.restrictedRoles.roles = roles
   },
@@ -128,14 +144,15 @@ _.extend(Roles, {
     if (Roles.isUnrestricted(conn) || (user._id !== currentUser)) {
       return user.roles
     } else if (restriction) {
-      if (restriction.group) {
+      if (restriction.groups) {
         let roles = {}
-        let userRoles = user.roles ? user.roles[restriction.group] : []
-        // l('userRoles', user, restriction, _.intersection(userRoles, restriction.roles))
+        restriction.groups.forEach((group) => {
+          let userRoles = user.roles ? user.roles[group] : []
+          // l('userRoles', user, restriction, _.intersection(userRoles, restriction.roles))
 
-        roles[restriction.group] = _.intersection(userRoles, restriction.roles)
+          roles[group] = _.intersection(userRoles, restriction.roles)
+        })
         return roles
-
       } else {
         return _.intersection(user.roles, restriction.roles)
       }
@@ -154,7 +171,7 @@ _.extend(Roles, {
       let type = types[name]
       check(type, {
         roles: [String],
-        group: Match.Optional(String),
+        groups: Match.Optional([String]),
         expirationInSeconds: Match.Optional(Match.Integer)
       }, 'incorrect setRestrictionTypes format')
     }

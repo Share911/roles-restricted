@@ -28,16 +28,24 @@ let users = {
 }
 
 describe('roles-restricted', function () {
-  this.timeout(5000)
-
-  context('restricted access', function () {
-
+  context('helper funcs', function () {
     it('can compare equal arrays', function () {
       expect(arraysEqual(['user'], ['user'])).to.be.true
     })
     it('can compare inequal arrays', function () {
       expect(arraysEqual(['user'], ['bar'])).to.be.false
     })
+  })
+})
+
+describe('roles-restricted', function () {
+  this.timeout(5000)
+
+  afterEach(function () {
+    Meteor.logout()
+  })
+
+  context('restricted access', function () {
 
     it('can check if restricted user is in role', function () {
       testRestrictedUser('eve', ['user'])
@@ -56,11 +64,29 @@ describe('roles-restricted', function () {
       testRestrictedUser('joe', ['user'], 'group1')
     })
 
-    it('restricted user is in role with Roles.GLOBAL_GROUP when no group given', function() {
-      Roles.restrict({roles: ['user'], group: Roles.GLOBAL_GROUP})
-      testUser('joe', ['user'])
+    it('can restrict multiple groups at once', function() {
+      const username = 'bob'
+      Meteor.connection.setUserId(username)
+      Roles.restrict({roles: ['user'], groups: ['group1', 'group2']})
+      testUser(username, ['user'], 'group1')
+      testUser(username, ['user'], 'group2')
+      testUser(username, [], 'group3')
+    })
+    it('can restrict multiple groups at once2', function() {
+      const username = 'bob'
+      Meteor.connection.setUserId(username)
+      Roles.restrict({roles: ['user'], groups: ['group1', 'groups3']})
+      testUser(username, ['user'], 'group1')
+      testUser(username, [], 'group2')
+      testUser(username, [], 'group3')
     })
 
+    it('restricted user is in role with Roles.GLOBAL_GROUP when no group given', function() {
+      const username = 'joe'
+      Meteor.connection.setUserId(username)      
+      Roles.restrict({roles: ['user'], groups: Roles.GLOBAL_GROUP})
+      testUser(username, ['user'])
+    })
 
     it('defaults secure when neither restricted nor unrestricted', function () {
       // clear connection from previous tests
@@ -113,12 +139,19 @@ describe('roles-restricted', function () {
 
 // -- restricted --
 
-function testRestrictedUser (username, expectedRoles, group) {
+function testRestrictedUser (username, expectedRoles, group, restrictionGroups) {
   Meteor.connection.setUserId(username)      
 
   restriction = {roles: ['user']}
-  if (group)
-    restriction.group = group
+  if (restrictionGroups) {
+    if (!Array.isArray(restrictionGroups))
+      throw new Error('restrictionGroups argument must be an array')
+    restriction.groups = restrictionGroups
+  } else {
+    if (group) {
+      restriction.groups = [group]
+    }
+  }
 
   Roles.restrict(restriction)
   
@@ -141,9 +174,9 @@ function testUser (username, expectedRoles, group) {
   // l("[testUser]", user, expectedRoles, group)
   // test using user object rather than userId to avoid mocking
   _.each(roles, function (role) {
-    var expected = _.contains(expectedRoles, role),
-        msg = username + ' expected to have \'' + role + '\' permission but does not',
-        nmsg = username + ' had un-expected permission ' + role
+    const expected = _.contains(expectedRoles, role)
+    const msg = username + ' expected to have \'' + role + '\' permission but does not'
+    const nmsg = username + ' had un-expected permission ' + role
 
     const actual = Roles.userIsInRole(user, role, group)
     // l(role, expected, actual)
