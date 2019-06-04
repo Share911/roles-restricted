@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.8] - 2019-06-04
+- Update dependencies and github URL
+
+## [0.1.7] - 2019-06-02
+- Support restricting multiple groups at once
+
 ## [0.1.6] - 2018-03-28
 - Fix "Error: TypeError: undefined is not an object (evaluating 'r.roles[i.group]')"
 
