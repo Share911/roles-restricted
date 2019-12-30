@@ -1,6 +1,6 @@
 Package.describe({
   name: 'share911:roles-restricted',
-  version: '0.1.8',
+  version: '0.1.9',
   summary: 'Adds restricted-access state and autologin links to alanning:roles',
   git: 'https://github.com/Share911/roles-restricted.git'
 });
@@ -23,6 +23,7 @@ Package.onUse(function(api) {
   api.export('Roles');
 
   api.addFiles(['common/roles-restricted.js',
+                'common/goog.math.ExponentialBackoff.js',
                 'common/roles_overwrites.js']);
 
   api.addFiles(['server/roles-restricted.js',

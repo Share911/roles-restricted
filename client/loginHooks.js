@@ -1,31 +1,38 @@
+import { Meteor } from "meteor/meteor"
+
 let LoginHooks = new Meteor.Collection('roles-restricted/login-hooks')
+const initialTimeout = 10
+const maxTimeout = 300
 
 /**
  * If it was an event from a successful login, and if the userId matches, then
 unrestrict login
- * @param {object} data - login event data
+ * @param {string} userId - user _id
  */
-let maybeUnrestrictLogin = function({loggedIn, userId}) {
-  if (loggedIn) {
-    let isCorrectUser = userId === Meteor.userId()
+function maybeUnrestrictLogin (userId, expBackoff = null) {
+  const isCorrectUser = userId === Meteor.userId()
 
-    if (isCorrectUser) {
-      Roles._unrestrictConnection()
+  if (isCorrectUser) {
+    l('[maybeUnrestrictLogin] unrestricting connection')
+    Roles._unrestrictConnection()
+  } else {
+    // sometimes Meteor.userId() has not been set until after some time passes
+    // XXX is it ever not set? change to reactive trigger on Meteor.userId()?
+    expBackoff = expBackoff || new GOOG.math.ExponentialBackoff(initialTimeout, maxTimeout)
+    const timeout = expBackoff.getValue()
 
+    l('[maybeUnrestrictLogin] users dont match', userId, Meteor.userId(), '. Trying again in', timeout)
+    if (timeout > maxTimeout) {
+      // stop checking
+      console.warn("roles-restricted warning: onLogin server event userId ("
+        + userId + ") doesn't match client Meteor.userId() (" +
+        Meteor.userId() + "). Please submit an issue on Github.")
     } else {
-      // sometimes Meteor.userId() has not been set until after deferring
-      // XXX is it ever not set? change to reactive trigger on Meteor.userId()?
-      Meteor.defer(function() {
-        isCorrectUser = userId === Meteor.userId()
-        if (isCorrectUser) {
-          l('deferred unrestricting')
-          Roles._unrestrictConnection()
-        } else {
-          console.warn("roles-restricted warning: onLogin server event userId ("
-                       + userId + ") doesn't match client Meteor.userId() (" +
-                       Meteor.userId() + "). Please submit an issue on Github.")
-        }
-      })
+      expBackoff.backoff()
+      Meteor.setTimeout(function () {
+        // schedule another check in a little while
+        maybeUnrestrictLogin(userId, expBackoff)
+      }, timeout)
     }
   }
 }
@@ -36,13 +43,15 @@ let lastUserId = null
 Tracker.autorun(function() {
   // react to changes in Meteor.userId()
   let userId = Meteor.userId()
-  
-  let wasLoggedIn = !! lastUserId,
-      nowLoggedOut = ! userId
 
-  l('remove unrestricted autorun', wasLoggedIn, nowLoggedOut)
-  if (wasLoggedIn && nowLoggedOut)
+  let wasLoggedIn = !! lastUserId
+  let nowLoggedOut = ! userId
+
+  l('autorun: may remove unrestricted...', {wasLoggedIn, nowLoggedOut})
+  if (wasLoggedIn && nowLoggedOut) {
     Roles._clearUnrestriction()
+    l('autorun: removed unrestricted autorun')
+  }
 
   if (userId)
     lastUserId = userId
@@ -75,8 +84,9 @@ LoginHooks.find({}).observeChanges({
       if (data.type === 'resume')
         callResumeAttemptCompletedHooks(data.loggedIn)
 
-      if (data.loggedIn)
-        maybeUnrestrictLogin(data)
+      if (data.loggedIn) {
+        maybeUnrestrictLogin(data.userId)
+      }
     }
   }
 })
